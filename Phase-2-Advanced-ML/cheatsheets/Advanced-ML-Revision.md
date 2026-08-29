@@ -178,157 +178,143 @@
 
 ### 3.1 Need visualization / dimensionality reduction?
 
-```mermaid
 
 flowchart TD
 
-A[Goal?] --> B{Visualization only?}
+  A["Goal?"] --> B{"Visualization only?"}
 
-B -->|Yes| C{Need stable embedding / transform new points?}
+  B -->|Yes| C{"Need stable embedding / transform new points?"}
 
-C -->|Yes| D[UMAP]
+  C -->|Yes| D["UMAP"]
 
-C -->|No| E[t-SNE]
+  C -->|No| E["t-SNE"]
 
-B -->|No| F{Need compression / speedup for modeling?}
+  B -->|No| F{"Need compression / speedup for modeling?"}
 
-F -->|Yes| G[PCA (or variants)]
+  F -->|Yes| G["PCA (or variants)"]
 
-F -->|No| H[Skip DR; focus on features/model]
+  F -->|No| H["Skip DR; focus on features/model"]
 
-```
 
 ### 3.2 Need clustering?
 
-```mermaid
 
 flowchart TD
 
-A[Clustering goal] --> B{Know expected #clusters k?}
+  A["Clustering goal"] --> B{"Know expected #clusters k?"}
 
-B -->|Yes| C{Clusters overlap / elliptical?}
+  B -->|Yes| C{"Clusters overlap / elliptical?"}
 
-C -->|Yes| D[GMM]
+  C -->|Yes| D["GMM"]
 
-C -->|No| E[K-Means baseline]
+  C -->|No| E["K-Means baseline"]
 
-B -->|No| F{Expect noise/outliers + arbitrary shapes?}
+  B -->|No| F{"Expect noise/outliers + arbitrary shapes?"}
 
-F -->|Yes| G[DBSCAN]
+  F -->|Yes| G["DBSCAN"]
 
-F -->|No| H[Try hierarchical (small data) or estimate k then K-Means/GMM]
+  F -->|No| H["Try hierarchical (small data) or estimate k then K-Means/GMM"]
 
-```
 
 ### 3.3 Need anomaly detection?
 
-```mermaid
 
 flowchart TD
 
-A[Anomaly detection] --> B{Have labeled anomalies?}
+  A["Anomaly detection"] --> B{"Have labeled anomalies?"}
 
-B -->|Yes| C[Supervised classifier + threshold policy]
+  B -->|Yes| C["Supervised classifier + threshold policy"]
 
-B -->|No| D{Need general robust baseline on tabular?}
+  B -->|No| D{"Need general robust baseline on tabular?"}
 
-D -->|Yes| E[Isolation Forest]
+  D -->|Yes| E["Isolation Forest"]
 
-D -->|No| F{Need local density anomalies?}
+  D -->|No| F{"Need local density anomalies?"}
 
-F -->|Yes| G[LOF]
+  F -->|Yes| G["LOF"]
 
-F -->|No| H[Rules / z-score baseline + monitoring]
+  F -->|No| H["Rules / z-score baseline + monitoring"]
 
-```
 
 ### 3.4 Need forecasting?
 
-```mermaid
 
 flowchart TD
 
-A[Forecasting] --> B{Time series?}
+  A["Forecasting"] --> B{"Time series?"}
 
-B -->|Yes| C[Chronological split + walk-forward]
+  B -->|Yes| C["Chronological split + walk-forward"]
 
-C --> D{Strong seasonality?}
+  C --> D{"Strong seasonality?"}
 
-D -->|Yes| E[Seasonal naive → Holt-Winters]
+  D -->|Yes| E["Seasonal naive → Holt-Winters"]
 
-D -->|No| F[Naive/MA → Exponential smoothing]
+  D -->|No| F["Naive/MA → Exponential smoothing"]
 
-E --> G{Need stronger univariate baseline?}
+  E --> G{"Need stronger univariate baseline?"}
 
-F --> G
+  F --> G
 
-G -->|Yes| H[ARIMA/SARIMAX]
+  G -->|Yes| H["ARIMA/SARIMAX"]
 
-G -->|No| I[Ship baseline + monitor drift]
+  G -->|No| I["Ship baseline + monitor drift"]
 
-```
 
 ### 3.5 Need explainability?
 
-```mermaid
 
 flowchart TD
 
-A[Explainability need] --> B{Need local explanations per prediction?}
+  A["Explainability need"] --> B{"Need local explanations per prediction?"}
 
-B -->|Yes| C[SHAP (or local surrogate) + reason codes]
+  B -->|Yes| C["SHAP (or local surrogate) + reason codes"]
 
-B -->|No| D{Need global model understanding?}
+  B -->|No| D{"Need global model understanding?"}
 
-D -->|Yes| E[Permutation importance + PDP/ICE]
+  D -->|Yes| E["Permutation importance + PDP/ICE"]
 
-D -->|No| F[Use simpler model / documented policy]
+  D -->|No| F["Use simpler model / documented policy"]
 
-```
 
 ### 3.6 Recommender selection?
 
-```mermaid
 
 flowchart TD
 
-A[Recommender] --> B{Have interaction history?}
+  A["Recommender"] --> B{"Have interaction history?"}
 
-B -->|No| C[Popularity + Content-based + onboarding]
+  B -->|No| C["Popularity + Content-based + onboarding"]
 
-B -->|Yes| D{Catalog has strong metadata?}
+  B -->|Yes| D{"Catalog has strong metadata?"}
 
-D -->|Yes| E[Hybrid: content + CF]
+  D -->|Yes| E["Hybrid: content + CF"]
 
-D -->|No| F[CF / MF embeddings]
+  D -->|No| F["CF / MF embeddings"]
 
-E --> G[Add retrieval + ranking as scale grows]
+  E --> G["Add retrieval + ranking as scale grows"]
 
-F --> G
+  F --> G
 
-```
 
 ### 3.7 Drift response?
 
-```mermaid
 
 flowchart TD
 
-A[Alert: metric shift] --> B{Data quality failing? nulls/schema/ranges}
+  A["Alert: metric shift"] --> B{"Data quality failing? nulls/schema/ranges"}
 
-B -->|Yes| C[Pipeline fix / rollback feature changes]
+  B -->|Yes| C["Pipeline fix / rollback feature changes"]
 
-B -->|No| D{Only feature distributions shifted?}
+  B -->|No| D{"Only feature distributions shifted?"}
 
-D -->|Yes| E[Investigate segments; validate downstream performance]
+  D -->|Yes| E["Investigate segments; validate downstream performance"]
 
-D -->|No| F{Performance drop with labels?}
+  D -->|No| F{"Performance drop with labels?"}
 
-F -->|Yes| G[Concept drift: retrain + feature updates + threshold recalibration]
+  F -->|Yes| G["Concept drift: retrain + feature updates + threshold recalibration"]
 
-F -->|No| H[Monitor; seasonal/expected variation]
+  F -->|No| H["Monitor; seasonal/expected variation"]
 
-```
 
 ---
 
