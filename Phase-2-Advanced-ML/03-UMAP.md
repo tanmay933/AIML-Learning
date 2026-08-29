@@ -381,7 +381,7 @@ flowchart TD
 - `metric` — distance definition (`"cosine"` for embeddings, `"euclidean"` for general numeric data)
 - `n_components` — 2–3 for visualization, 10–50 for modeling
 - `random_state` — always fix for reproducibility (trades off some parallelization speed)
-
+ 
 **Golden rules:**
 - Scale features first.
 - Choose `metric` deliberately based on data type.
