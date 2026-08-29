@@ -4,63 +4,63 @@
 
 ```mermaid
 flowchart TD
-  A[Start: What problem are you solving?] --> B{Problem type}
-  B -->|Regression / Classification (tabular)| C{Dataset size & constraints}
-  B -->|Clustering| D{Need #clusters k?}
-  B -->|Dimensionality Reduction / Visualization| E{Goal}
-  B -->|Anomaly Detection| F{Labels available?}
-  B -->|Recommendation| G{Interaction history?}
-  B -->|Time Series Forecasting| H{Forecasting horizon & seasonality}
+  A["Start: What problem are you solving?"] --> B{"Problem type"}
+  B -->|Regression / Classification (tabular)| C{"Dataset size & constraints"}
+  B -->|Clustering| D{"Need #clusters k?"}
+  B -->|Dimensionality Reduction / Visualization| E{"Goal"}
+  B -->|Anomaly Detection| F{"Labels available?"}
+  B -->|Recommendation| G{"Interaction history?"}
+  B -->|Time Series Forecasting| H{"Forecasting horizon & seasonality"}
 
   %% Tabular supervised
-  C -->|Small/medium + need strong baseline| C1[XGBoost / LightGBM / CatBoost]
-  C -->|Many categoricals + minimal preprocessing| C2[CatBoost]
-  C -->|Very large data + speed priority| C3[LightGBM]
-  C -->|Need maximum ecosystem/maturity| C4[XGBoost]
-  C -->|Strict interpretability/constraints| C5[Logistic/Linear + constraints OR GBDT + explainability]
+  C -->|Small/medium + need strong baseline| C1["XGBoost / LightGBM / CatBoost"]
+  C -->|Many categoricals + minimal preprocessing| C2["CatBoost"]
+  C -->|Very large data + speed priority| C3["LightGBM"]
+  C -->|Need maximum ecosystem/maturity| C4["XGBoost"]
+  C -->|Strict interpretability/constraints| C5["Logistic/Linear + constraints OR GBDT + explainability"]
 
   %% Clustering
-  D -->|Yes| D1{Overlapping / elliptical clusters?}
-  D -->|No| D2{Expect noise & arbitrary shapes?}
-  D1 -->|Yes| D3[GMM]
-  D1 -->|No| D4[K-Means baseline]
-  D2 -->|Yes| D5[DBSCAN]
-  D2 -->|No| D6[Estimate k then K-Means/GMM]
+  D -->|Yes| D1{"Overlapping / elliptical clusters?"}
+  D -->|No| D2{"Expect noise & arbitrary shapes?"}
+  D1 -->|Yes| D3["GMM"]
+  D1 -->|No| D4["K-Means baseline"]
+  D2 -->|Yes| D5["DBSCAN"]
+  D2 -->|No| D6["Estimate k then K-Means/GMM"]
 
   %% Dimensionality reduction
-  E -->|Compression / speed for modeling| E1[PCA]
-  E -->|2D/3D visualization| E2{Need stable embedding / transform new points?}
-  E2 -->|Yes| E3[UMAP]
-  E2 -->|No| E4[t-SNE]
+  E -->|Compression / speed for modeling| E1["PCA"]
+  E -->|2D/3D visualization| E2{"Need stable embedding / transform new points?"}
+  E2 -->|Yes| E3["UMAP"]
+  E2 -->|No| E4["t-SNE"]
 
   %% Anomaly detection
-  F -->|Yes| F1[Supervised classifier + threshold policy]
-  F -->|No| F2{General robust tabular baseline?}
-  F2 -->|Yes| F3[Isolation Forest]
-  F2 -->|No| F4{Local density anomalies?}
-  F4 -->|Yes| F5[LOF]
-  F4 -->|No| F6[One-Class SVM (small/medium) or rules baseline]
+  F -->|Yes| F1["Supervised classifier + threshold policy"]
+  F -->|No| F2{"General robust tabular baseline?"}
+  F2 -->|Yes| F3["Isolation Forest"]
+  F2 -->|No| F4{"Local density anomalies?"}
+  F4 -->|Yes| F5["LOF"]
+  F4 -->|No| F6["One-Class SVM (small/medium) or rules baseline"]
 
   %% Recommenders
-  G -->|No| G1[Popularity + Content-based + onboarding]
-  G -->|Yes| G2{Good item metadata?}
-  G2 -->|Yes| G3[Hybrid: Content + CF]
-  G2 -->|No| G4[Collaborative filtering / MF embeddings]
-  G3 --> G5[Add retrieval + ranking + constraints as scale grows]
+  G -->|No| G1["Popularity + Content-based + onboarding"]
+  G -->|Yes| G2{"Good item metadata?"}
+  G2 -->|Yes| G3["Hybrid: Content + CF"]
+  G2 -->|No| G4["Collaborative filtering / MF embeddings"]
+  G3 --> G5["Add retrieval + ranking + constraints as scale grows"]
   G4 --> G5
 
   %% Time series
-  H --> I[Chronological split + walk-forward validation]
-  I --> J{Strong seasonality?}
-  J -->|Yes| K[Seasonal naive → Exponential smoothing (Holt-Winters)]
-  J -->|No| L[Naive/Moving avg → Exponential smoothing]
-  K --> M{Need stronger classical?}
+  H --> I["Chronological split + walk-forward validation"]
+  I --> J{"Strong seasonality?"}
+  J -->|Yes| K["Seasonal naive → Exponential smoothing (Holt-Winters)"]
+  J -->|No| L["Naive/Moving avg → Exponential smoothing"]
+  K --> M{"Need stronger classical?"}
   L --> M
-  M -->|Yes| N[ARIMA/SARIMAX]
-  M -->|No| O[Ship baseline + monitor drift]
-  N --> P{Need exogenous drivers / many series?}
-  P -->|Yes| Q[ML with lags + calendar + exog]
-  P -->|No| R[Classical is enough]
+  M -->|Yes| N["ARIMA/SARIMAX"]
+  M -->|No| O["Ship baseline + monitor drift"]
+  N --> P{"Need exogenous drivers / many series?"}
+  P -->|Yes| Q["ML with lags + calendar + exog"]
+  P -->|No| R["Classical is enough"]
 ```
 
 ---
