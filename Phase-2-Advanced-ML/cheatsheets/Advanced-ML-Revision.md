@@ -179,6 +179,7 @@
 ### 3.1 Need visualization / dimensionality reduction?
 
 
+```mermaid
 flowchart TD
 
   A["Goal?"] --> B{"Visualization only?"}
@@ -194,11 +195,12 @@ flowchart TD
   F -->|Yes| G["PCA (or variants)"]
 
   F -->|No| H["Skip DR; focus on features/model"]
-
+```
 
 ### 3.2 Need clustering?
 
 
+```mermaid
 flowchart TD
 
   A["Clustering goal"] --> B{"Know expected #clusters k?"}
@@ -214,11 +216,12 @@ flowchart TD
   F -->|Yes| G["DBSCAN"]
 
   F -->|No| H["Try hierarchical (small data) or estimate k then K-Means/GMM"]
-
+```
 
 ### 3.3 Need anomaly detection?
 
 
+```mermaid
 flowchart TD
 
   A["Anomaly detection"] --> B{"Have labeled anomalies?"}
@@ -234,11 +237,12 @@ flowchart TD
   F -->|Yes| G["LOF"]
 
   F -->|No| H["Rules / z-score baseline + monitoring"]
-
+```
 
 ### 3.4 Need forecasting?
 
 
+```mermaid
 flowchart TD
 
   A["Forecasting"] --> B{"Time series?"}
@@ -258,11 +262,12 @@ flowchart TD
   G -->|Yes| H["ARIMA/SARIMAX"]
 
   G -->|No| I["Ship baseline + monitor drift"]
-
+```
 
 ### 3.5 Need explainability?
 
 
+```mermaid
 flowchart TD
 
   A["Explainability need"] --> B{"Need local explanations per prediction?"}
@@ -274,11 +279,12 @@ flowchart TD
   D -->|Yes| E["Permutation importance + PDP/ICE"]
 
   D -->|No| F["Use simpler model / documented policy"]
-
+```
 
 ### 3.6 Recommender selection?
 
 
+```mermaid
 flowchart TD
 
   A["Recommender"] --> B{"Have interaction history?"}
@@ -294,11 +300,12 @@ flowchart TD
   E --> G["Add retrieval + ranking as scale grows"]
 
   F --> G
-
+```
 
 ### 3.7 Drift response?
 
 
+```mermaid
 flowchart TD
 
   A["Alert: metric shift"] --> B{"Data quality failing? nulls/schema/ranges"}
@@ -314,7 +321,7 @@ flowchart TD
   F -->|Yes| G["Concept drift: retrain + feature updates + threshold recalibration"]
 
   F -->|No| H["Monitor; seasonal/expected variation"]
-
+```
 
 ---
 
