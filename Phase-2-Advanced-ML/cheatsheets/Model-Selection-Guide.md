@@ -1,35 +1,35 @@
-Machine Learning Model Selection Guide
+# Machine Learning Model Selection Guide
 
-1) Complete ML Decision Flowchart
+## 1) Complete ML Decision Flowchart
 
-
+```mermaid
 flowchart TD
 
   A["Start: What problem are you solving?"] --> B{"Problem type"}
 
-  B -->|Tabular supervised| C{"Dataset size & constraints"}
+  B -->|"Tabular supervised"| C{"Dataset size & constraints"}
 
-  B -->|Clustering| D{"Need #clusters k?"}
+  B -->|"Clustering"| D{"Need #clusters k?"}
 
-  B -->|DR or visualization| E{"Goal"}
+  B -->|"DR or visualization"| E{"Goal"}
 
-  B -->|Anomaly detection| F{"Labels available?"}
+  B -->|"Anomaly detection"| F{"Labels available?"}
 
-  B -->|Recommendation| G{"Interaction history?"}
+  B -->|"Recommendation"| G{"Interaction history?"}
 
-  B -->|Time series| H{"Forecasting horizon & seasonality"}
+  B -->|"Time series"| H{"Forecasting horizon & seasonality"}
 
   %% Tabular supervised
 
-  C -->|Strong baseline| C1["XGBoost / LightGBM / CatBoost"]
+  C -->|"Strong baseline"| C1["XGBoost / LightGBM / CatBoost"]
 
-  C -->|Many categoricals| C2["CatBoost"]
+  C -->|"Many categoricals"| C2["CatBoost"]
 
-  C -->|Large and fast| C3["LightGBM"]
+  C -->|"Large and fast"| C3["LightGBM"]
 
-  C -->|Mature ecosystem| C4["XGBoost"]
+  C -->|"Mature ecosystem"| C4["XGBoost"]
 
-  C -->|Interpretability| C5["Logistic/Linear + constraints OR GBDT + explainability"]
+  C -->|"Interpretability"| C5["Logistic/Linear + constraints OR GBDT + explainability"]
 
   %% Clustering
 
@@ -47,9 +47,9 @@ flowchart TD
 
   %% Dimensionality reduction
 
-  E -->|Compression| E1["PCA"]
+  E -->|"Compression"| E1["PCA"]
 
-  E -->|Visualization| E2{"Need stable embedding / transform new points?"}
+  E -->|"Visualization"| E2{"Need stable embedding / transform new points?"}
 
   E2 -->|Yes| E3["UMAP"]
 
@@ -106,223 +106,147 @@ flowchart TD
   P -->|Yes| Q["ML with lags + calendar + exog"]
 
   P -->|No| R["Classical is enough"]
+```
 
+---
 
-2) Comparison Tables
+## 2) Comparison Tables
 
-2.1 PCA vs t-SNE vs UMAP
+### 2.1 PCA vs t-SNE vs UMAP
 
 | Dimension | PCA | t-SNE | UMAP |
-
 |---|---|---|---|
-
 | Primary purpose | compression, denoising | visualization | visualization (+ sometimes reusable embeddings) |
-
 | Preserves | global variance | local neighborhoods | local + some global |
-
 | Transform new points | Yes | Not reliably (often refit) | Yes (common) |
-
 | Scalability | High | Medium/low | Medium/high |
-
 | Interpretability | Medium (components) | Low | Low |
-
 | Production suitability | High (as preprocessing) | Low | Medium (carefully) |
-
 | Common wrong use | thinking PCA “finds clusters” | using for preprocessing or metrics | assuming embedding stability across retrains |
-
 | Interview importance | High | Medium | Medium |
 
 **Production default**
 
 - **PCA** for compression/speed/denoising.
-
 - **UMAP** for visualization; consider for embeddings only if you can version + monitor.
-
 - **t-SNE** for exploratory visualization only.
 
-2.2 K-Means vs GMM vs DBSCAN
+### 2.2 K-Means vs GMM vs DBSCAN
 
 | Dimension | K-Means | GMM | DBSCAN |
-
 |---|---|---|---|
-
 | Cluster shape | spherical-ish | elliptical | arbitrary shapes |
-
 | Needs `k` | Yes | Yes | No |
-
 | Handles outliers/noise | Poor | Medium | Strong (noise label) |
-
 | Output type | hard assignment | soft probabilities | hard + noise |
-
 | Scalability | High | Medium | Medium |
-
 | Key hyperparameters | `n_clusters`, init | `n_components`, `covariance_type` | `eps`, `min_samples` |
-
 | Production suitability | High baseline | Medium | Medium (sensitive tuning) |
-
 | Interpretability | Medium | Medium | Medium |
-
 | Interview importance | High | High | High |
 
 **Production default**
 
 - Start with **K-Means** as baseline if `k` is known and clusters are blob-like.
-
 - Use **GMM** if overlap/soft membership matters.
-
 - Use **DBSCAN** when noise/outliers are expected and density clusters are meaningful (but validate `eps` sensitivity).
 
-2.3 Isolation Forest vs LOF vs One-Class SVM
+### 2.3 Isolation Forest vs LOF vs One-Class SVM
 
 | Dimension | Isolation Forest | LOF | One-Class SVM |
-
 |---|---|---|---|
-
 | Best for | general tabular anomalies | local density anomalies | boundary of normal |
-
 | Scaling | Good | Medium | Poor–Medium |
-
 | Training speed | Fast | Medium | Slow on big data |
-
 | Key hyperparameters | `n_estimators`, `contamination`, `max_samples` | `n_neighbors`, `contamination` | `nu`, `kernel`, `gamma` |
-
 | Interpretability | Low–Medium | Low | Low |
-
 | Production suitability | High baseline | Medium | Low–Medium (fragile) |
-
 | Typical failure | wrong contamination/threshold | sensitive to scale + neighbors | heavy tuning + compute |
-
 | Interview importance | High | Medium | Medium |
 
 **Production default**
 
 - **Isolation Forest** as first unsupervised anomaly baseline for tabular.
-
 - **LOF** when “local neighborhood” anomalies matter.
-
 - **One-Class SVM** only for smaller datasets or when you’ve proven it wins.
 
-2.4 XGBoost vs LightGBM vs CatBoost (tabular supervised)
+### 2.4 XGBoost vs LightGBM vs CatBoost (tabular supervised)
 
 | Dimension | XGBoost | LightGBM | CatBoost |
-
 |---|---|---|---|
-
 | Strength | robust default, mature | very fast, scalable | excellent categorical handling |
-
 | Categorical features | needs encoding | supports (depends) | native + strong |
-
 | Speed | fast | very fast | fast |
-
 | Overfit risk | manageable | higher if unconstrained | manageable |
-
 | Production suitability | very high | high | high |
-
 | Typical pick when | general purpose | large datasets | many categoricals + minimal preprocessing |
-
 | Key hyperparameters | `n_estimators`, `max_depth`, `learning_rate`, `subsample`, `colsample_bytree` | `num_leaves`, `max_depth`, `learning_rate`, `min_data_in_leaf`, `feature_fraction` | `depth`, `learning_rate`, `l2_leaf_reg`, `iterations` |
-
 | Interpretability | medium (SHAP works well) | medium | medium |
-
 | Interview importance | High | High | High |
 
 **Production default**
 
 - **CatBoost** if categoricals are central and you want strong out-of-the-box performance.
-
 - **LightGBM** if throughput/training speed at scale is the bottleneck.
-
 - **XGBoost** if you want the safest all-around default and wide ecosystem support.
 
-2.5 Popularity vs Content-Based vs Collaborative Filtering (Recommenders)
+### 2.5 Popularity vs Content-Based vs Collaborative Filtering (Recommenders)
 
 | Dimension | Popularity | Content-Based | Collaborative Filtering |
-
 |---|---|---|---|
-
 | Personalization | None | Medium | High |
-
 | Needs interactions | No | Optional | Yes |
-
 | Cold start (user) | Good | Medium | Poor |
-
 | Cold start (item) | Medium | Good | Poor |
-
 | Explainability | High | High | Medium |
-
 | Production role | baseline/fallback/trending | new items + explainability | personalization core |
-
 | Key failure mode | popularity bias | overspecialization | cold start + feedback loops |
-
 | Interview importance | High | High | High |
 
 **Production default**
 
 - Always ship **popularity** baseline.
-
 - Add **content-based** for item cold start and explainability.
-
 - Add **CF/MF embeddings** once you have interaction volume.
-
 - Most real systems become **hybrid**.
 
-2.6 Forecasting: Classical vs ML vs Deep Learning
+### 2.6 Forecasting: Classical vs ML vs Deep Learning
 
 | Dimension | Classical (ES/ARIMA) | ML (GBDT/linear w/ features) | Deep Learning (future topic) |
-
 |---|---|---|---|
-
 | Data needs | low–medium | medium | high |
-
 | Handles exogenous variables | limited (SARIMAX helps) | strong | strong |
-
 | Many series at scale | challenging per-series tuning | strong (shared patterns) | strong (infra-heavy) |
-
 | Interpretability | high–medium | medium | low–medium |
-
 | Production complexity | low | medium | high |
-
 | Best first choice | yes for univariate & baselines | yes for feature-rich demand | only when justified by scale |
-
 | Interview importance | High | High | Medium |
 
 **Production default**
 
 - Start with **seasonal naive** + **exponential smoothing**.
-
 - Use **ARIMA/SARIMAX** for strong univariate baseline.
-
 - Prefer **ML with lags + calendar + exog** when drivers matter or you have many series.
-
 - Deep learning only when data + infra justify it (not covered here beyond mention).
 
-2.7 Manual Feature Engineering vs Representation Learning
+### 2.7 Manual Feature Engineering vs Representation Learning
 
 | Dimension | Manual feature engineering | Representation learning |
-
-|---|---|
-
+|---|---|---|
 | Best for | tabular business problems | unstructured data (text/image/audio), embeddings |
-
 | Data requirement | lower | higher |
-
 | Infra complexity | low–medium | medium–high |
-
 | Interpretability | higher | lower |
-
 | Latency | often lower | varies |
-
 | Production risk | lower | higher (coupling, drift) |
-
 | Interview framing | “strong baseline + good features” | “needed when features are hard to design” |
 
 **Production default**
 
 - Tabular: manual features + boosting.
-
 - Unstructured: representation learning (or feature extraction baseline first).
 
-3) Engineering Rules (50+ “If → Use → Reason”)
+## 3) Engineering Rules (50+ “If → Use → Reason”)
 
 1. If you need **2D visualization** of high-dimensional data → Use **UMAP** → Better global structure and reusable transform than t-SNE.
 
@@ -434,53 +358,37 @@ flowchart TD
 
 55. If you need the fastest “what should I use” on tabular classification → **CatBoost if many categoricals; else XGBoost/LightGBM** → Defaults.
 
-4) Production Recommendations (What to choose and why)
+## 4) Production Recommendations (What to choose and why)
 
-4.1 Practical defaults by problem type
+### 4.1 Practical defaults by problem type
 
 | Problem type | Production-first default | Why |
-
 |---|---|---|
-
 | Tabular classification/regression | **GBDT** (XGBoost/LightGBM/CatBoost) | strong, robust, fast iteration |
-
 | Clustering baseline | **K-Means** (if `k` known) | scalable, simple |
-
 | Overlapping clusters | **GMM** | soft membership helps |
-
 | Clustering with noise/outliers | **DBSCAN** (after sensitivity checks) | explicit noise |
-
 | Dimensionality reduction for modeling | **PCA** | stable transform |
-
 | Visualization embedding | **UMAP** | better reuse and speed |
-
 | Unsupervised anomaly detection | **Isolation Forest** | best general baseline |
-
 | Recommendation cold start | **Popularity + content** | immediate value + coverage |
-
 | Recommendation personalization | **Hybrid (CF + content + popularity)** | robust, production standard |
-
 | Forecasting baseline | **Seasonal naive + exponential smoothing** | fast + strong baseline |
-
 | Forecasting with exog drivers | **ML with lags + calendar + exog** | captures drivers; scales across series |
 
-4.2 What “production suitability” really means
+### 4.2 What “production suitability” really means
 
 Before choosing an algorithm, answer:
 
 - Can we compute the required features **online**?
-
 - Can we meet **latency** and **throughput**?
-
 - Do we have a plan for **monitoring**, **drift**, and **retraining**?
-
 - Do we need **interpretability** or **reason codes**?
-
 - Can we version artifacts and reproduce training?
 
 If any answer is “no”, prefer the simpler approach.
 
-5) Common Wrong Choices
+## 5) Common Wrong Choices
 
 1. Using **t-SNE** as a preprocessing step for modeling (unstable, not designed for transform).
 
@@ -510,7 +418,7 @@ If any answer is “no”, prefer the simpler approach.
 
 14. Not versioning preprocessing—training/serving skew silently kills performance.
 
-6) Interview Decision Questions (Scenario-based only)
+## 6) Interview Decision Questions (Scenario-based only)
 
 1. You need a 2D visualization of embeddings for a presentation. Which method and why?
 
@@ -552,94 +460,63 @@ If any answer is “no”, prefer the simpler approach.
 
 20. You need per-decision explanations for a risk scoring model. What explainability approach do you propose?
 
-7) One-page Cheat Sheet
+## 7) One-page Cheat Sheet
 
-Quick picks
+### Quick picks
 
 - **Tabular supervised:** GBDT → CatBoost (many categoricals), LightGBM (scale/speed), XGBoost (safe default).
 
 - **Dimensionality reduction:**
-
 - PCA = preprocessing/compression
-
 - UMAP = visualization + reusable transform
-
 - t-SNE = visualization only
 
 - **Clustering:**
-
 - K-Means = fast baseline, needs k
-
 - GMM = overlapping/elliptical + soft assignments
-
 - DBSCAN = arbitrary shapes + noise (watch `eps`)
 
 - **Anomaly detection:**
-
 - Isolation Forest = default baseline
-
 - LOF = local density anomalies
-
 - One-Class SVM = small data / special cases
 
 - **Recommenders:**
-
 - Start: popularity + content
-
 - Mature: hybrid (CF + content + popularity), retrieval + ranking
 
 - **Forecasting:**
-
 - Start: seasonal naive + exponential smoothing
-
 - Strong univariate: SARIMA/SARIMAX
-
 - Drivers/many series: ML with lags + calendar + exog
 
 - **Feature strategy:**
-
 - Tabular: manual features + boosting
-
 - Unstructured: representation learning (or feature extraction baseline first)
 
-High-impact hyperparameters to remember
+### High-impact hyperparameters to remember
 
 - t-SNE: `perplexity`, `learning_rate`, `n_iter`
-
 - UMAP: `n_neighbors`, `min_dist`, `n_components`
-
 - DBSCAN: `eps`, `min_samples`
-
 - GMM: `n_components`, `covariance_type`
-
 - Isolation Forest: `contamination`, `n_estimators`, `max_samples`
-
 - LightGBM: `num_leaves`, `min_data_in_leaf`, `learning_rate`
-
 - XGBoost: `max_depth`, `n_estimators`, `subsample`, `colsample_bytree`, `learning_rate`
-
 - CatBoost: `depth`, `iterations`, `learning_rate`, `l2_leaf_reg`
 
-Fast red flags
+### Fast red flags
 
 - Random split on time data → leakage.
-
 - t-SNE used for preprocessing → wrong tool.
-
 - DBSCAN on varying density → unstable clustering.
-
 - MAPE with zeros → nonsense.
-
 - “Accuracy” used for fraud/anomaly → misleading.
 
-Production mindset
+### Production mindset
 
 - Baselines first.
-
 - Correct splits.
-
 - Version features + models.
-
 - Monitor data quality + prediction distribution + delayed labels.
-
 - Have rollback + retrain plan.
